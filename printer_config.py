@@ -528,7 +528,7 @@ def print_service(service_alteon_object):
     line += f'    group {group_id}\n    rport {real_server_port}'
 
     if protocol and protocol.lower() != "tcp":
-        line += f'    protocol {protocol.lower()}\n'
+        line += f'\n    protocol {protocol.lower()}\n'
 
     # Handle redirect action
     if action == "redirect":

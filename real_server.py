@@ -3,7 +3,7 @@ from materials import is_fqdn , validate_port, is_app_service_exists, is_protoco
 
 class RealServer:
 
-    def __init__(self, name, ip_address=None, comment=None, state='ena', ip_version='v4', nat_ip=None, nat_mask=None):
+    def __init__(self, name, ip_address=None, comment="", state='ena', ip_version='v4', nat_ip=None, nat_mask=None):
         self.name = name
         self.ip_address = ip_address
         self.state = state

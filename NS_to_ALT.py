@@ -97,13 +97,13 @@ def assemble_slb(bind_lb_vserver_lst,
                         pass
 
         if virt_dict and service_dict :
-            flag_is_service_exists= False
+            #flag_is_service_exists= False
             virt_obj = Virt(virt_dict["virt_name"])
-            if alt_objc.get_service(service_dict["service_name"]):
-                service_obj = alt_objc.get_service(service_dict["service_name"])
-                flag_is_service_exists = True
-            else:
-                service_obj = Service(service_dict["service_name"])
+            # if alt_objc.get_service(service_dict["service_name"]):
+            #     service_obj = alt_objc.get_service(service_dict["service_name"])
+            #     flag_is_service_exists = True
+            # else:
+            service_obj = Service(service_dict["service_name"])
             virt_obj.add_service_id(service_dict["service_name"])
 
             service_obj.set_virt_assoiciate(virt_dict["virt_name"])
@@ -127,7 +127,7 @@ def assemble_slb(bind_lb_vserver_lst,
 
             for key, value in virt_dict.items():
                 if key == "virt_name":
-                    pass
+                    continue
                 if key == "service_type":
                     for service in service_mapping_to_ALT:
                         if service['service'] == value:
@@ -141,14 +141,26 @@ def assemble_slb(bind_lb_vserver_lst,
                                     for cert in vserver_cert_lst:
                                         if virt_dict['virt_name'] == cert['virt_name']:
                                             service_obj.set_get_ssl_certificate(cert['certkeyName'])
+                                if service_obj.get_ssl_certificate() == "":
+                                    service_obj.set_ssl_policy_name("")
+                                    service_obj.set_delayed_binding("disable")
+                                    write_to_unhandled_flags(ns_object.get_unhandled_flags_path(),
+                                                             virt_dict["virt_name"],
+                                                             virt_dict['service_type'],
+                                                             "| dbind configuration changed to disable due to lake of binding certificate config ")
+                                if value == "ANY":
+                                    service_obj.set_real_server_port("1")
+                                    group_obj.set_health_check("icmp")
+
 
                                 continue
                             else:
                                 write_to_unhandled_flags(ns_object.get_unhandled_flags_path(),
                                                          virt_dict["virt_name"],
                                                          virt_dict['service_type'],
-                                                         "Service Type Not Supported for convert")
-                                pass
+                                                         "| Service Type Not Supported for convert")
+                                continue
+
                 if key == 'virt_ip':
                     if validate_ipv4(value):
                         virt_obj.set_ip_version('v4')
@@ -165,6 +177,14 @@ def assemble_slb(bind_lb_vserver_lst,
                                                  "Invalid Ip address")
                 if key == 'service_port':
                     service_obj.set_service_port(value)
+                    if value == "53":
+                        service_obj.set_application("dns")
+                    if value == "22":
+                        service_obj.set_application("ssh")
+                    if value == "*":
+                        service_obj.set_service_port("1")
+                    if value == "21":
+                        service_obj.set_application("ftp")
                     continue
 
                 if supported_attr_vserver(key):
@@ -174,13 +194,16 @@ def assemble_slb(bind_lb_vserver_lst,
                                 for val in feature['value_map']:
                                     if value == val['netscaler_value'] and val['alteon_support'] is True:
                                         service_obj.set_persistency_mode(val['alteon_value'])
+                                        continue
                                     else:
                                         write_to_unhandled_flags(ns_object.get_unhandled_flags_path(),
                                                                  virt_dict["virt_name"],
                                                                  f'Feature : {key} Value: {value}',
                                                                  "Invalid Persistency type to convert")
+                                        continue
                     if key == 'cookieName':
                         service_obj.set_persist_cookie_insert(value)
+                        continue
 
                     if key == 'lbMethod':
                         for feature in add_lb_vserver_flags:
@@ -188,58 +211,71 @@ def assemble_slb(bind_lb_vserver_lst,
                                 for val in feature['value_map']:
                                     if value == val['netscaler_value'] and val['alteon_support'] is True:
                                         group_obj.set_slb_metric(val['alteon_value'])
+                                        continue
                                     else:
                                         write_to_unhandled_flags(ns_object.get_unhandled_flags_path(),
                                                                  virt_dict["virt_name"],
                                                                  f'Feature : {key} Value: {value}',
                                                                  "Invalid Load Balancing Method type to convert")
+                                        continue
                     if key == 'timeout':
                         service_obj.set_persistency_timeout(value)
+                        continue
                     if key == 'netmask' or key == 'v6netmasklen':
                         group_obj.set_slb_metric('phash')
                         group_obj.set_phash_mask(value)
+                        continue
                     if key == 'state':
                         for feature in add_lb_vserver_flags:
                             if feature['netscaler_vserver_feature'] == key:
                                 for val in feature['value_map']:
                                     if value == val['netscaler_value'] and val['alteon_support'] is True:
                                         virt_obj.set_enabled(val['alteon_value'])
+                                        continue
                                     else:
                                         write_to_unhandled_flags(ns_object.get_unhandled_flags_path(),
                                                                  virt_dict["virt_name"],
                                                                  f'Feature : {key} Value: {value}',
-                                                                 "Unsupported state value")
+                                                                 "Unsupported state value alteon gets ena or dis")
+                                        continue
                     if key == 'sessionless':
                         for feature in add_lb_vserver_flags:
                             if feature['netscaler_vserver_feature'] == key:
                                 for val in feature['value_map']:
                                     if value == val['netscaler_value'] and val['alteon_support'] is True:
                                         service_obj.set_not_nat(val['alteon_value'])
+                                        continue
                                     else:
                                         write_to_unhandled_flags(ns_object.get_unhandled_flags_path(),
                                                                  virt_dict["virt_name"],
                                                                  f'Feature : {key} Value: {value}',
                                                                  "Unsupported session config value")
+                                        continue
                     if key == "connfailover":
                         for feature in add_lb_vserver_flags:
                             if feature['netscaler_vserver_feature'] == key:
                                 for val in feature['value_map']:
                                     if value == val['netscaler_value'] and val['alteon_support'] is True:
                                         service_obj.set_mirror(val['alteon_value'])
+                                        continue
                                     else:
                                         write_to_unhandled_flags(ns_object.get_unhandled_flags_path(),
                                                                  virt_dict["virt_name"],
                                                                  f'Feature : {key} Value: {value}',
                                                                  "Unsupported connection failover value")
+                                        continue
 
                     if key == 'comment':
                         virt_obj.set_description(value)
+                        continue
+
 
                 else:
                     write_to_unhandled_flags(ns_object.get_unhandled_flags_path(),
                                              virt_dict["virt_name"],
-                                             f'Unsupported {key} feature and value {value}',
-                                             "Unsupported Feature for convert tool")
+                                             f'Unsupported  feature: {key} | value: {value} |',
+                                             "Virt exception: This Feature Not included on the converter tool yet")
+                    continue
 
             for key, value in service_dict.items():
                 if key == 'port':
@@ -254,11 +290,13 @@ def assemble_slb(bind_lb_vserver_lst,
                                     if value == val['netscaler_value'] and val['alteon_support'] is True:
                                         if "ssl" in virt_dict['service_type'].lower() or "http" in virt_dict['service_type'].lower():
                                             service_obj.set_insert_xff(val['alteon_value'])
+                                            continue
                                     else:
                                         write_to_unhandled_flags(ns_object.get_unhandled_flags_path(),
                                                                  f'Vserver: {virt_dict["virt_name"]} Service: {service_dict["service_name"]}',
-                                                                 f'Unsupported {key} feature and value {value}',
+                                                                 f'Unsupported  feature: {key} | value: {value} |',
                                                                  "Unsupported XFF Setting Service that are not HTTP")
+                                        continue
 
                     if key == "usip" :
                         for feature in service_group_flags:
@@ -266,25 +304,35 @@ def assemble_slb(bind_lb_vserver_lst,
                                 for val in feature['value_map']:
                                     if value == val['netscaler_value'] and val['alteon_support'] is True:
                                         service_obj.set_pip(val['alteon_value'])
+                                        continue
                                     else:
                                         write_to_unhandled_flags(ns_object.get_unhandled_flags_path(),
                                                                  f'Vserver: {virt_dict["virt_name"]} Service: {service_dict["service_name"]}',
-                                                                 f'Unsupported {key} feature and value {value}',
+                                                                 f'Unsupported  feature: {key} | value: {value} |',
                                                                  "Unsupported NAT Type")
+                                        continue
                     if key == 'CKA':
                         if value == 'YES':
                             service_obj.set_TCPFrontend("keep_alive_tcp_pol")
+                            continue
                     if key == "comment":
                         service_obj.set_description(value)
+                        continue
+                    if key == "service_type":
+                        continue
+                    if key == "service_name":
+                        continue
+
 
                 else:
                     write_to_unhandled_flags(ns_object.get_unhandled_flags_path(),
                                              f'Vserver: {virt_dict["virt_name"]} Service: {service_dict["service_name"]}',
-                                             f'Unsupported {key} feature and value {value}',
-                                             f"Unsupported Feature for convert tool")
+                                             f'Unsupported  feature: {key} | value: {value} |',
+                                             f"Service exception: This Feature Not included on the converter tool yet")
+                    continue
 
-            if not flag_is_service_exists:
-                alt_objc.add_service(service_obj)
+            #if not flag_is_service_exists:
+            alt_objc.add_service(service_obj)
             alt_objc.add_group(group_obj)
             alt_objc.add_virt(virt_obj)
         else:

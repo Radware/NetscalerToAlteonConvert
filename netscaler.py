@@ -655,6 +655,7 @@ class Netscaler:
                 self.handle_bind_service_no_monitor(line)
 
             if is_bind_lb_vserver_with_policy(line):
+                printer_config.write_to_handled_lines(self.handled_lines_file_path, line)
                 self.handle_bind_lb_vserver_with_policy(line)
 
             if is_bind_ssl_profile_vserver(line):
@@ -680,10 +681,11 @@ class Netscaler:
                 self.handle_add_responder_action(line)
 
             if is_bind_ssl_vserver(line):
+                printer_config.write_to_handled_lines(self.handled_lines_file_path, line)
                 self.handle_bind_ssl_vserver(line)
 
             if is_link_ssl_certKey(line):
-                printer_config.write_to_handled_lines(self.handled_lines_file_path, line)
+                #printer_config.write_to_handled_lines(self.handled_lines_file_path, line)
                 self.handle_link_ssl_certKey(line)
 
             if is_add_lb_monitor(line):

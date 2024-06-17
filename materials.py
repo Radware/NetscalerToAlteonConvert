@@ -333,7 +333,7 @@ service_mapping_to_ALT = [
     {"service" : "DTLS", "protocol":"UDP", "forceproxy":"false", "Supported": "False"},
     {"service" : "DNS", "protocol":"UDP", "forceproxy":"True", "Supported": "True", "Application": "DNS"},
     {"service" : "DHCPRA", "protocol":"TCP", "forceproxy":"false", "Supported": "False"},
-    {"service" : "ANY", "protocol":"TCP and UDP", "forceproxy":"false", "Supported": "True", "Application": "IP"},
+    {"service" : "ANY", "protocol":"both", "forceproxy":"false", "Supported": "True", "Application": "IP"},
     {"service" : "SIP_UDP", "protocol":"UDP", "forceproxy":"True", "Supported": "True", "Application": "SIP"},
     {"service" : "SIP_TCP", "protocol":"TCP", "forceproxy":"True", "Supported": "True", "Application": "SIP"},
     {"service" : "SIP_SSL", "protocol":"TCP", "forceproxy":"True", "Supported": "True", "Application": "SIP"},
