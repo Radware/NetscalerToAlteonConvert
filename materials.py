@@ -2,6 +2,14 @@ import ipaddress
 import re
 
 
+def is_valid_ip(address):
+    try:
+        ipaddress.ip_address(address)
+        return True
+    except ValueError:
+        return False
+
+
 def validate_ipv6(ip_address):
     try:
         ipaddress.IPv6Address(ip_address)
@@ -162,9 +170,12 @@ def is_add_ssl_profile(line):
 
 
 def is_add_server(line):
-    split_line = line.split(" ")
-    if split_line[0] == "add" and split_line[1] == "server":
+    split_line = line.split()
+    if len(split_line) < 4:
+        return False  # Ensure there are enough parts in the split line
+    if split_line[0] == "add" and split_line[1] == "server" and is_valid_ip(split_line[3]):
         return True
+    return False
 
 
 def is_add_server_fqdn(line):
