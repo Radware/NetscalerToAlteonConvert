@@ -33,7 +33,7 @@ if alteon_object.list_all_groups():
     for group in alteon_object.list_all_groups():
         write_to_alteon_config(configuration_file_path,print_group(group))
 else:
-    print("Error - No Group configured on Net scaler(Might be error with service \ serviceGroup) ? ")
+    print("Error - No Group configured on Net scaler(Might be error with service or serviceGroup) ? ")
 print("[*]Finished Processing Group configuration")
 
 print("[+]Processing Health checks monitor configuration")
@@ -65,7 +65,7 @@ if alteon_object.list_all_services():
     for service in alteon_object.list_all_services():
         write_to_alteon_config(configuration_file_path,print_service(service))
 else:
-    print("Error - No Services configured on Net scaler(Might be error with service \ serviceGroup) ? ")
+    print("Error - No Services configured on Net scaler(Might be error with service or serviceGroup) ? ")
 print("[*]Finished Processing Service configuration")
 
 uniquify_lines_in_file(net_scaler.get_unhandled_flags_path())
