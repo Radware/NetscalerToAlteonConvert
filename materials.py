@@ -163,7 +163,7 @@ def is_add_ssl_profile(line):
 
 def is_add_server(line):
     split_line = line.split(" ")
-    if split_line[0] == "add" and split_line[1] == "server" and is_ip_address(split_line[3]):
+    if split_line[0] == "add" and split_line[1] == "server":
         return True
 
 

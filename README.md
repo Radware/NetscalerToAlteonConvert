@@ -87,6 +87,7 @@ Once we have the Alteon object, we print the configuration using the getters of 
 - Support for Traffic Domain
 - support TLS policies (Currently there is default ssl policy supports TLSv1.2 and TLSv1.3)
 - support for HTTP options
+- GSLB configurations
 
 
 ### Roadmap

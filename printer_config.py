@@ -58,7 +58,6 @@ def create_conversion_project(netscaler_config_file):
 
 def write_to_alteon_config(path,line):
     with open(rf"{path}", "a") as f:
-        print(line)
         f.write(line + "\n")
 
 
