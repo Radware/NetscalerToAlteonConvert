@@ -112,6 +112,7 @@ def assemble_slb(bind_lb_vserver_lst,
             service_ports_lst = []
             for service_grp in bind_service_group_no_mon:
                 if service_dict['service_name'] == service_grp['service_name']:
+
                     service_ports_lst.append(service_grp['port'])
                     if len(set(service_ports_lst)) > 1:
                         for port in get_unique_values(service_ports_lst):

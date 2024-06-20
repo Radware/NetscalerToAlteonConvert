@@ -435,6 +435,7 @@ class Netscaler:
 
     def handle_add_service(self, line):
         add_service_dict = {}
+        bind_service_group = {}
         bind_service_no_monitor_dict= {}
         split_line = line.split(" ")
         add_service_dict["service_name"] = split_line[2].strip()
@@ -445,6 +446,10 @@ class Netscaler:
             bind_service_no_monitor_dict["port"] = split_line[5].strip()
             bind_service_no_monitor_dict["service_name"] = split_line[2].strip()
             self.bind_service_no_monitor_list.append(bind_service_no_monitor_dict)
+        bind_service_group['service_name'] = split_line[2].strip()
+        bind_service_group['service_member'] = split_line[3].strip()
+        bind_service_group['port'] = split_line[5].strip()
+        self.bind_serviceGroup_no_monitor_list.append(bind_service_group)
         for index, item in enumerate(split_line):
             if index > 5 and "-" in item:
                 flag = item.strip("-")
